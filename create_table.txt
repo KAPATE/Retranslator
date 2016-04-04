@@ -10,4 +10,5 @@ copy table2
 show   {{table1
 append table1,table2
 erase table2
-
+delete 2034
+delete 2001

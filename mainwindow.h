@@ -35,7 +35,6 @@ private slots:
 private:
     Ui::MainWindow *ui;
     std::string fileName;
-    unsigned int countTables;
     std::string nameOfMainTable;
 };
 

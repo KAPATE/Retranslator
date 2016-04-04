@@ -6,8 +6,7 @@ std::vector <std::string> add(std::string line) {
     int i = 0;
     while (i<5) {
         if (i==4) {
-            command = line.substr(0,line.length()-1);
-            line.clear();
+            command = line.substr(0,line.length());
         }
         else {
             command = line.substr(0,line.find(','));
