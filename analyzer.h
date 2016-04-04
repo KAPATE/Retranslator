@@ -1,8 +1,8 @@
 #ifndef ANALYZER_H
 #define ANALYZER_H
 #include <iostream>
+#include <vector>
 
-std::string analyzer(std::string line);
-std::string parser(std::string code);
+std::vector <std::string> add(std::string line);
 
 #endif // ANALYZER_H

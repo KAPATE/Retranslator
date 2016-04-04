@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = retranslator
 TEMPLATE = app
 
+CONFIG += c++14 console
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -20,3 +21,4 @@ HEADERS  += mainwindow.h \
     analyzer.h
 
 FORMS    += mainwindow.ui
+
