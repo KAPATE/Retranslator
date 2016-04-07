@@ -16,6 +16,9 @@
 #include <cstdio>
 #include <QStandardItemModel>
 #include <QStandardItem>
+#include <functional>
+#include <cctype>
+#include <locale>
 
 constexpr unsigned int string2int(const char* str, int h = 0);
 

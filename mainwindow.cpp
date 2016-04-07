@@ -5,6 +5,23 @@ constexpr unsigned int string2int(const char* str, int h) {
     return !str[h] ? 5381 : (string2int(str, h + 1) * 33) ^ str[h];
 }
 
+// trim from start
+static inline std::string &ltrim(std::string &s) {
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+        return s;
+}
+
+// trim from end
+static inline std::string &rtrim(std::string &s) {
+        s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+        return s;
+}
+
+// trim from both ends
+static inline std::string &trim(std::string &s) {
+        return ltrim(rtrim(s));
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -77,25 +94,46 @@ void MainWindow::on_action_triggered()
                 QString id = "id";
                 QString buff = buffer.data();
                 std::string temporary {};
+                std::string temp {};
                 std::getline(fin,temporary);
                 while (fin) {
                     std::getline(fin,line);
-                    xz.push_back(line.c_str());
+                    temporary.clear();
+                    for (int i = 0; i< 5; i++) {
+                        if ( i != 4){
+                    temporary.append(line.substr(0,line.find(" ")+1));
+                    line.erase(0,line.find(" ")+1);
+                    //line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end());
+                    //std::cout<<line<<" line after remove"<<std::endl;
+                    temp.clear();
+                    temp.append(ltrim(line).c_str());
+                    line.clear();
+                    line.append(temp.c_str());
+                        }
+                        if (i ==4) {
+                            temporary.append(line.substr(0,line.length()));
+                            line.erase(0,line.length());
+                            //line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end());
+                            //std::cout<<line<<" line after remove"<<std::endl;
+                            temp.clear();
+                            temp.append(ltrim(line).c_str());
+                            line.clear();
+                            line.append(temp.c_str());
+                        }
+                    }
+                    xz.push_back(temporary.c_str());
                 }
                 std::vector <std::string> xz_rezerv;
                 for (int i = 0; i < xz.size();i++)
                 {
                     xz_rezerv.push_back(xz.at(i).c_str());
                 }
-                qDebug()<<buff << process << buff.compare(process);
-                if (!buff.compare(process)) {
-                    std::cout<< "before sort "<<xz.begin().base()<<" probel "<<xz.end().base()<<std::endl;
+                if (buff == process) {
                     for (int i = 0; i < xz.size(); i++)
                     {
                         std::cout << xz.at(i) << std::endl;
                     }
                     std::sort(xz.begin(), xz.end());
-                    std::cout<< " after sort"<<xz.begin().base()<<" "<<xz.end().base() <<std::endl;
                     for (int i = 0; i < xz.size(); i++)
                     {
                         std::cout << xz.at(i) << std::endl;
