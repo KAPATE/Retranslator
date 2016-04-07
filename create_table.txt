@@ -3,9 +3,9 @@ add {word.exe, 700 , 2 , superuser, 3232}
 add {excel.exe , 400 , 2 , eroha , 2301}
 add {ie.exe , 324, 1 , eroha, 4093}
 add {svchost.exe , 200 , 3 , system, 2001}
-sort priority
 copy table1
 add {gta.exe , 450, 3 , eroha, 3021}
+sort process
 copy table2
 show   {{table1
 append table1,table2
