@@ -36,11 +36,6 @@ public:
 
 private slots:
     void on_action_triggered();
-public slots:
-    void get_sort(std::vector <std::string> process, std::vector <std::string> memory, std::vector <std::string> priority, std::vector <std::string> user, std::vector <std::string> id, int rows, int cols);
-
-signals:
-    void sort_me (std::vector <std::string> process, std::vector <std::string> memory, std::vector <std::string> priority, std::vector <std::string> user, std::vector <std::string> id, int rows, int cols);
 
 private:
     Ui::MainWindow *ui;

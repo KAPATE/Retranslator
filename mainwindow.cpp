@@ -26,7 +26,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    QObject::connect(this, SIGNAL(sort_me(std::vector <std::string>,std::vector <std::string>,std::vector <std::string>,std::vector <std::string>,std::vector <std::string>, int ,int)),this,SLOT(get_sort(std::vector <std::string>,std::vector <std::string>,std::vector <std::string>,std::vector <std::string>,std::vector <std::string>, int ,int)));
     ui->setupUi(this);
     nameOfMainTable = "mainTable.txt";
     //ui->tableView->hide();
@@ -83,81 +82,106 @@ void MainWindow::on_action_triggered()
                 }
 
                 case (string2int("sort")): {
-                std::ifstream fin(nameOfMainTable);
-                std::ofstream fout("temporary_file.txt");
-                std::string line {};
-                std::vector <std::string> xz ;
-                QString priority = "priority";
-                QString process = "process";
-                QString memory = "memory";
-                QString user = "user";
-                QString id = "id";
-                QString buff = buffer.data();
-                std::string temporary {};
-                std::string temp {};
-                std::getline(fin,temporary);
-                while (fin) {
-                    std::getline(fin,line);
-                    temporary.clear();
-                    for (int i = 0; i< 5; i++) {
-                        if ( i != 4){
-                    temporary.append(line.substr(0,line.find(" ")+1));
-                    line.erase(0,line.find(" ")+1);
-                    //line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end());
-                    //std::cout<<line<<" line after remove"<<std::endl;
-                    temp.clear();
-                    temp.append(ltrim(line).c_str());
-                    line.clear();
-                    line.append(temp.c_str());
-                        }
+                    std::ifstream fin(nameOfMainTable);
+                    std::ofstream fout("temporary_file.txt");
+                    std::string line {};
+                    std::vector <std::string> xz ;
+                    QString priority = "priority";
+                    QString process = "process";
+                    QString memory = "memory";
+                    QString user = "user";
+                    QString id = "id";
+                    QString column = trim(buffer).c_str();
+
+                    std::string header_data{};
+                    std::string code {};
+                    std::string temp {};
+
+                    std::getline(fin,header_data); // read header data in main table
+
+                    while (fin) {
+
+                        std::getline(fin,line);
+                        code.clear();
+                        for (int i = 0; i< 5; i++) {
+                            if ( i < 4) {
+                                temp.append(trim(line));
+                                line.clear();
+                                line.append(temp);
+                                temp.clear();
+
+                                code.append(line.substr(0,line.find(" ")+1));
+                                line.erase(0,line.find(" ")+1);
+                                //line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end());
+                                //std::cout<<line<<" line after remove"<<std::endl;
+                                temp.append(trim(line));
+                                line.clear();
+                                line.append(temp);
+                                temp.clear();
+                            }
                         if (i ==4) {
-                            temporary.append(line.substr(0,line.length()));
-                            line.erase(0,line.length());
-                            //line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end());
-                            //std::cout<<line<<" line after remove"<<std::endl;
-                            temp.clear();
-                            temp.append(ltrim(line).c_str());
+                            temp.append(trim(line));
                             line.clear();
-                            line.append(temp.c_str());
+                            line.append(temp);
+                            temp.clear();
+                            code.append(line.substr(0,line.length()));
+                            line.clear();
                         }
                     }
-                    xz.push_back(temporary.c_str());
+                    if (!code.empty()) xz.push_back(code);
                 }
                 std::vector <std::string> xz_rezerv;
                 for (int i = 0; i < xz.size();i++)
                 {
-                    xz_rezerv.push_back(xz.at(i).c_str());
+                    xz_rezerv.push_back(xz.at(i));
                 }
-                if (buff == process) {
-                    for (int i = 0; i < xz.size(); i++)
-                    {
-                        std::cout << xz.at(i) << std::endl;
-                    }
+                if (column == process) {
                     std::sort(xz.begin(), xz.end());
                     for (int i = 0; i < xz.size(); i++)
                     {
                         std::cout << xz.at(i) << std::endl;
                     }
+                    std::cout<<"column: process"<<std::endl;
                 }
 
-                if (buff == memory) {
-                    xz.at(0).erase(0, xz.at(0).find(" ") + 1);
-                    xz.at(1).erase(0, xz.at(1).find(" ") + 1);
-                    xz.at(2).erase(0, xz.at(2).find(" ") + 1);
-                    xz.at(3).erase(0, xz.at(3).find(" ") + 1);
-                    xz.at(4).erase(0, xz.at(4).find(" ") + 1);
-                    xz.at(5).erase(0, xz.at(5).find(" ") + 1);
+                if (column == memory) {
+                    for (int i = 0; i<xz.size();i++){
+                        std::string temp {};
+                        temp.append(trim(xz.at(i)));
+                        xz.at(i).clear();
+                        xz.at(i).append(temp);
+                        temp.clear();
+                        xz.at(i).erase(0, xz.at(i).find(" ") + 1);
+                        temp.append(trim(xz.at(i)));
+                        xz.at(i).clear();
+                        xz.at(i).append(temp);
+                        temp.clear();
+                    }
+
                     std::sort(xz.begin(), xz.end());
 
-                    for (int i = 0; i<xz.size(); i++) {
+                    for (int i = 0; i < xz_rezerv.size(); i++) {
+                        std::string buffer = trim(xz_rezerv.at(i));
+                        xz_rezerv.at(i).clear();
+                        xz_rezerv.at(i).append(buffer);
+                        buffer.clear();
+                    }
+
+                    for (int i = 0; i < xz.size(); i++) {
+                        std::string buffer = trim(xz.at(i));
+                        xz.at(i).clear();
+                        xz.at(i).append(buffer);
+                        buffer.clear();
+                    }
+                    std::string buffer {};
+                    for (int i = 0; i<xz_rezerv.size(); i++) {
                         for (int j = 0; j<xz.size(); j++) {
                             if (xz_rezerv.at(i).find(xz.at(j).c_str()) != std::string::npos) {
-                                std::string buffer = xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1);
-                                buffer.append(xz.at(j).c_str());
-                                //std::cout << xz.at(j).c_str() << " its hz " << std::endl;
+                                buffer.append(xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1));
+                                buffer.append(xz.at(j));
                                 xz.at(j).clear();
-                                xz.at(j).append(buffer.c_str());
-                                //std::cout<<buffer.c_str()<<" its buffer "<<std::endl;
+                                xz.at(j).append(buffer);
+                                buffer.clear();
                                 break;
                             }
                         }
@@ -165,34 +189,119 @@ void MainWindow::on_action_triggered()
                     for (int i = 0; i< xz.size(); i++) {
                         std::cout << xz.at(i) << std::endl;
                     }
+                    std::cout << "memory" <<std::endl;
                 }
 
-                if (buff == priority) {
-                    xz.at(0).erase(0, xz.at(0).find(" ") + 1);
-                    xz.at(1).erase(0, xz.at(1).find(" ") + 1);
-                    xz.at(2).erase(0, xz.at(2).find(" ") + 1);
-                    xz.at(3).erase(0, xz.at(3).find(" ") + 1);
-                    xz.at(4).erase(0, xz.at(4).find(" ") + 1);
-                    xz.at(5).erase(0, xz.at(5).find(" ") + 1);
-                    xz.at(0).erase(0, xz.at(0).find(" ") + 1);
-                    xz.at(1).erase(0, xz.at(1).find(" ") + 1);
-                    xz.at(2).erase(0, xz.at(2).find(" ") + 1);
-                    xz.at(3).erase(0, xz.at(3).find(" ") + 1);
-                    xz.at(4).erase(0, xz.at(4).find(" ") + 1);
-                    xz.at(5).erase(0, xz.at(5).find(" ") + 1);
+                if (column == priority) {
+                    for (int i = 0; i<xz.size();i++){
+                        std::string temp {};
+                        temp.append(trim(xz.at(i)));
+                        xz.at(i).clear();
+                        xz.at(i).append(temp);
+                        temp.clear();
+                        xz.at(i).erase(0, xz.at(i).find(" ") + 1);
+                        temp.append(trim(xz.at(i)));
+                        xz.at(i).clear();
+                        xz.at(i).append(temp);
+                        temp.clear();
+                        xz.at(i).erase(0, xz.at(i).find(" ") + 1);
+                        temp.append(trim(xz.at(i)));
+                        xz.at(i).clear();
+                        xz.at(i).append(temp);
+                        temp.clear();
+                    }
+
                     std::sort(xz.begin(), xz.end());
+
+                    for (int i = 0; i < xz_rezerv.size(); i++) {
+                        std::string buffer = trim(xz_rezerv.at(i));
+                        xz_rezerv.at(i).clear();
+                        xz_rezerv.at(i).append(buffer);
+                        buffer.clear();
+                    }
+
+                    for (int i = 0; i < xz.size(); i++) {
+                        std::string buffer = trim(xz.at(i));
+                        xz.at(i).clear();
+                        xz.at(i).append(buffer);
+                        buffer.clear();
+                    }
+
+                    std::string buffer {};
+                    for (int i = 0; i<xz.size(); i++) {
+                        for (int j = 0; j<xz.size(); j++) {
+                            if (xz_rezerv.at(i).find(xz.at(j).c_str()) != std::string::npos) {
+                                buffer.append(xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1));
+                                xz_rezerv.at(i).erase(0, xz_rezerv.at(i).find(" ") + 1);
+                                buffer.append(xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1));
+                                buffer.append(xz.at(j));
+                                xz.at(j).clear();
+                                xz.at(j).append(buffer);
+                                buffer.clear();
+                                break;
+                                }
+                        }
+                    }
+                    for (int i = 0; i< xz.size(); i++) {
+                        std::cout << xz.at(i) << std::endl;
+                    }
+                    std::cout <<"priority"<< std::endl;
+                }
+
+                if (column == user) {
+                    for (int i = 0; i<xz.size();i++){
+                        std::string temp {};
+                        temp.append(trim(xz.at(i)));
+                        xz.at(i).clear();
+                        xz.at(i).append(temp);
+                        temp.clear();
+                        xz.at(i).erase(0, xz.at(i).find(" ") + 1);
+                        temp.append(trim(xz.at(i)));
+                        xz.at(i).clear();
+                        xz.at(i).append(temp);
+                        temp.clear();
+                        xz.at(i).erase(0, xz.at(i).find(" ") + 1);
+                        temp.append(trim(xz.at(i)));
+                        xz.at(i).clear();
+                        xz.at(i).append(temp);
+                        temp.clear();
+                        xz.at(i).erase(0, xz.at(i).find(" ") + 1);
+                        temp.append(trim(xz.at(i)));
+                        xz.at(i).clear();
+                        xz.at(i).append(temp);
+                        temp.clear();
+                    }
+
+                    std::sort(xz.begin(), xz.end());
+
+                    for (int i = 0; i < xz_rezerv.size(); i++) {
+                        std::string buffer = trim(xz_rezerv.at(i));
+                        xz_rezerv.at(i).clear();
+                        xz_rezerv.at(i).append(buffer);
+                        buffer.clear();
+                    }
+
+                    for (int i = 0; i < xz.size(); i++) {
+                        std::string buffer = trim(xz.at(i));
+                        xz.at(i).clear();
+                        xz.at(i).append(buffer);
+                        buffer.clear();
+                    }
+
+                    std::string buffer {};
 
                     for (int i = 0; i<xz.size(); i++) {
                         for (int j = 0; j<xz.size(); j++) {
                             if (xz_rezerv.at(i).find(xz.at(j).c_str()) != std::string::npos) {
-                                std::string buffer = xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1);
+                                buffer.append(xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1));
                                 xz_rezerv.at(i).erase(0, xz_rezerv.at(i).find(" ") + 1);
                                 buffer.append(xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1));
-                                buffer.append(xz.at(j).c_str());
-                                std::cout << xz.at(j).c_str() << " its hz " << std::endl;
+                                xz_rezerv.at(i).erase(0, xz_rezerv.at(i).find(" ") + 1);
+                                buffer.append(xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1));
+                                buffer.append(xz.at(j));
                                 xz.at(j).clear();
-                                xz.at(j).append(buffer.c_str());
-                                std::cout<<buffer.c_str()<<" its buffer "<<std::endl;
+                                xz.at(j).append(buffer);
+                                buffer.clear();
                                 break;
                             }
                         }
@@ -200,81 +309,47 @@ void MainWindow::on_action_triggered()
                     for (int i = 0; i< xz.size(); i++) {
                         std::cout << xz.at(i) << std::endl;
                     }
+                    std::cout << "user" <<std::endl;
                 }
 
-                if (buff == user) {
-                    xz.at(0).erase(0, xz.at(0).find(" ") + 1);
-                    xz.at(1).erase(0, xz.at(1).find(" ") + 1);
-                    xz.at(2).erase(0, xz.at(2).find(" ") + 1);
-                    xz.at(3).erase(0, xz.at(3).find(" ") + 1);
-                    xz.at(4).erase(0, xz.at(4).find(" ") + 1);
-                    xz.at(5).erase(0, xz.at(5).find(" ") + 1);
-                    xz.at(0).erase(0, xz.at(0).find(" ") + 1);
-                    xz.at(1).erase(0, xz.at(1).find(" ") + 1);
-                    xz.at(2).erase(0, xz.at(2).find(" ") + 1);
-                    xz.at(3).erase(0, xz.at(3).find(" ") + 1);
-                    xz.at(4).erase(0, xz.at(4).find(" ") + 1);
-                    xz.at(5).erase(0, xz.at(5).find(" ") + 1);
-                    xz.at(0).erase(0, xz.at(0).find(" ") + 1);
-                    xz.at(1).erase(0, xz.at(1).find(" ") + 1);
-                    xz.at(2).erase(0, xz.at(2).find(" ") + 1);
-                    xz.at(3).erase(0, xz.at(3).find(" ") + 1);
-                    xz.at(4).erase(0, xz.at(4).find(" ") + 1);
-                    xz.at(5).erase(0, xz.at(5).find(" ") + 1);
+                if (column == id) {
+                    for (int i = 0; i<xz.size();i++){
+                        std::string temp {};
+                        temp.append(trim(xz.at(i)));
+                        xz.at(i).clear();
+                        xz.at(i).append(temp);
+                        temp.clear();
+                        xz.at(i).erase(0, xz.at(i).find(" ") + 1);
+                        temp.append(trim(xz.at(i)));
+                        xz.at(i).clear();
+                        xz.at(i).append(temp);
+                        temp.clear();
+                        xz.at(i).erase(0, xz.at(i).find(" ") + 1);
+                        temp.append(trim(xz.at(i)));
+                        xz.at(i).clear();
+                        xz.at(i).append(temp);
+                        temp.clear();
+                        xz.at(i).erase(0, xz.at(i).find(" ") + 1);
+                        temp.append(trim(xz.at(i)));
+                        xz.at(i).clear();
+                        xz.at(i).append(temp);
+                        temp.clear();
+                        xz.at(i).erase(0, xz.at(i).find(" ") + 1);
+                        temp.append(trim(xz.at(i)));
+                        xz.at(i).clear();
+                        xz.at(i).append(temp);
+                        temp.clear();
+                    }
+
                     std::sort(xz.begin(), xz.end());
+
+                    std::string buffer {};
 
                     for (int i = 0; i<xz.size(); i++) {
                         for (int j = 0; j<xz.size(); j++) {
                             if (xz_rezerv.at(i).find(xz.at(j).c_str()) != std::string::npos) {
-                                std::string buffer = xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1);                xz_rezerv.at(i).erase(0, xz_rezerv.at(i).find(" ") + 1);                buffer.append(xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1)); xz_rezerv.at(i).erase(0, xz_rezerv.at(i).find(" ") + 1); buffer.append(xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1));
-                                buffer.append(xz.at(j).c_str());
-                                //std::cout << xz.at(j).c_str() << " its hz " << std::endl;
-                                xz.at(j).clear();
-                                xz.at(j).append(buffer.c_str());
-                                //std::cout<<buffer.c_str()<< " its buffer "<<std::endl;
-                                break;
-                            }
-                        }
-                    }
-                    for (int i = 0; i< xz.size(); i++) {
-                        std::cout << xz.at(i) << std::endl;
-                    }
-                }
-
-                if (buff == id) {
-                    xz.at(0).erase(0, xz.at(0).find(" ") + 1);
-                    xz.at(1).erase(0, xz.at(1).find(" ") + 1);
-                    xz.at(2).erase(0, xz.at(2).find(" ") + 1);
-                    xz.at(3).erase(0, xz.at(3).find(" ") + 1);
-                    xz.at(4).erase(0, xz.at(4).find(" ") + 1);
-                    xz.at(5).erase(0, xz.at(5).find(" ") + 1);
-                    xz.at(0).erase(0, xz.at(0).find(" ") + 1);
-                    xz.at(1).erase(0, xz.at(1).find(" ") + 1);
-                    xz.at(2).erase(0, xz.at(2).find(" ") + 1);
-                    xz.at(3).erase(0, xz.at(3).find(" ") + 1);
-                    xz.at(4).erase(0, xz.at(4).find(" ") + 1);
-                    xz.at(5).erase(0, xz.at(5).find(" ") + 1);
-                    xz.at(0).erase(0, xz.at(0).find(" ") + 1);
-                    xz.at(1).erase(0, xz.at(1).find(" ") + 1);
-                    xz.at(2).erase(0, xz.at(2).find(" ") + 1);
-                    xz.at(3).erase(0, xz.at(3).find(" ") + 1);
-                    xz.at(4).erase(0, xz.at(4).find(" ") + 1);
-                    xz.at(5).erase(0, xz.at(5).find(" ") + 1);
-                    xz.at(0).erase(0, xz.at(0).find(" ") + 1);
-                    xz.at(1).erase(0, xz.at(1).find(" ") + 1);
-                    xz.at(2).erase(0, xz.at(2).find(" ") + 1);
-                    xz.at(3).erase(0, xz.at(3).find(" ") + 1);
-                    xz.at(4).erase(0, xz.at(4).find(" ") + 1);
-                    xz.at(5).erase(0, xz.at(5).find(" ") + 1);
-                    std::sort(xz.begin(), xz.end());
-
-                    for (int i = 0; i<xz.size(); i++) {
-                        for (int j = 0; j<xz.size(); j++) {
-                            if (xz_rezerv.at(i).find(xz.at(j).c_str()) != std::string::npos) {
-                                std::string buffer = xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1);
+                                buffer.append(xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1));
                                 xz_rezerv.at(i).erase(0, xz_rezerv.at(i).find(" ") + 1);
-                                //xz_rezerv.at(i).erase(0,xz_rezerv.at(i).find(" ")+1);
-                                //xz_rezerv.at(i).erase(0,xz_rezerv.at(i).find(" ")+1);
                                 buffer.append(xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1));
                                 xz_rezerv.at(i).erase(0, xz_rezerv.at(i).find(" ") + 1);
                                 buffer.append(xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1));
@@ -282,10 +357,9 @@ void MainWindow::on_action_triggered()
                                 buffer.append(xz_rezerv.at(i).substr(0, xz_rezerv.at(i).find(" ") + 1));
                                 xz_rezerv.at(i).erase(0, xz_rezerv.at(i).find(" ") + 1);
                                 buffer.append(xz.at(j).c_str());
-                                //std::cout << xz.at(j).c_str() << " its hz " << std::endl;
                                 xz.at(j).clear();
                                 xz.at(j).append(buffer.c_str());
-                                //std::cout<<buffer.c_str()<<" its buffer "<<std::endl;
+                                buffer.clear();
                                 break;
                             }
                         }
@@ -293,6 +367,7 @@ void MainWindow::on_action_triggered()
                     for (int i = 0; i< xz.size(); i++) {
                         std::cout << xz.at(i) << std::endl;
                     }
+                    std::cout << "id"<<std::endl;
                 }
                 fin.close();
                 fout.close();
@@ -357,38 +432,4 @@ void MainWindow::on_action_triggered()
         file.close();
         mainTable.close();
     }
-}
-
-void MainWindow::get_sort(std::vector <std::string> process, std::vector <std::string> memory, std::vector <std::string> priority, std::vector <std::string> user, std::vector <std::string> id, int rows, int cols)
-{
-    QStandardItemModel *model = new QStandardItemModel(rows,cols,this); //2 Rows and 3 Columns
-    model->setHorizontalHeaderItem(0, new QStandardItem(QString("PROCESS")));
-    model->setHorizontalHeaderItem(1, new QStandardItem(QString("MEMORY")));
-    model->setHorizontalHeaderItem(2, new QStandardItem(QString("PRIORITY")));
-    model->setHorizontalHeaderItem(3, new QStandardItem(QString("USER")));
-    model->setHorizontalHeaderItem(4, new QStandardItem(QString("ID")));
-    for (int i =0; i< process.size()-1; i++){
-            QStandardItem *firstRow = new QStandardItem(QString(process.at(i).c_str()));
-            model->setItem(i,0,firstRow);
-    }
-    for (int i =0; i< memory.size()-1; i++){
-            QStandardItem *firstRow = new QStandardItem(QString(memory.at(i).c_str()));
-            model->setItem(i,1,firstRow);
-    }
-    //for (int i =0; i< priority.size()-1; i++){
-    {
-            QStandardItem *firstRow = new QStandardItem(QString(priority.at(1).c_str()));
-            model->setItem(2,2,firstRow);}
-    //}
-    //for (int i =0; i< user.size()-1; i++){
-{
-            QStandardItem *firstRow = new QStandardItem(QString(user.at(2).c_str()));
-            model->setItem(3,3,firstRow);}
-    //}
-    //for (int i =0; i< id.size()-1; i++){
-{
-            QStandardItem *firstRow = new QStandardItem(QString(id.at(1).c_str()));
-            model->setItem(4,4,firstRow);}
-    //}
-    ui->tableView->setModel(model);
 }
